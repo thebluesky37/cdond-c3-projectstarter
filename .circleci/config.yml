@@ -54,7 +54,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build          
-          
+
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -149,7 +149,7 @@ jobs:
           root: .
           paths:
             - .circleci/ansible/inventory.txt
-      - destroy_environment:
+      - destroy-environment:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   configure-infrastructure:
@@ -175,7 +175,7 @@ jobs:
             ls -la
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy_environment:
+      - destroy-environment:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 workflows:  
@@ -196,3 +196,5 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
