@@ -1,4 +1,25 @@
 version: 2.1          
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end CloudFormation stacks given a workflow ID.
+    parameters:
+      workflow-id:
+        type: string
+        description: The ID of the workflow.
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            # Get the workflow ID parameter
+            WORKFLOW_ID="$<<parameters.workflow-id>>"
+            
+            # Destroy the back-end CloudFormation stack
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-$WORKFLOW_ID"
+            
+            # Destroy the front-end CloudFormation stack
+            aws cloudformation delete-stack --stack-name "udapeople-backend-$WORKFLOW_ID"
+
 jobs:
   build-frontend:
     docker:
@@ -33,6 +54,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build          
+          
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -46,6 +68,7 @@ jobs:
             cd frontend
             npm install
             npm run test
+
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -59,6 +82,7 @@ jobs:
             cd backend
             npm install
             npm run test
+
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -74,6 +98,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
+
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -89,6 +114,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
+
   deploy-infrastructure:
     docker:
      - image: cimg/aws:2023.05
@@ -120,11 +146,38 @@ jobs:
               --output text >> inventory.txt
             cat inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: .
           paths:
-            - project/.circleci/ansible/inventory.txt
-      # - destroy_environment:
-      #     stack_name: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            - .circleci/ansible/inventory.txt
+      - destroy_environment:
+          workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+  configure-infrastructure:
+    docker:
+      - image: python:3.9.0-alpine
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["b5:9f:17:ce:63:73:88:ef:a2:44:95:0d:8e:53:3a:c4"] # Find in CircleCI project SSH settings
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          working_directory: ./.circleci/ansible
+          command: |
+            apk add --update ansible
+            ansible --version
+      - run:
+          name: Configure server
+          working_directory: ./.circleci/ansible
+          command: |
+            pwd &&
+            ls -la
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy_environment:
+          workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
+
 workflows:  
   default:
     jobs:
