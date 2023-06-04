@@ -1,12 +1,19 @@
-- name: "Update apt packages, upgrade packages, and remove dependencies"
+- name: "update apt packages."
   become: yes
   apt:
     update_cache: yes
-    upgrade: yes
-    autoremove: yes
-    cache_valid_time: 3600
 
-- name: "Install nodejs, npm, n, nodejs 13.8.0, and pm2"
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: "remove dependencies that are no longer required"
+  become: yes
+  apt:
+    autoremove: yes
+
+- name: "install nodejs and npm"
   become: yes
   apt:
     name:
@@ -14,15 +21,22 @@
       - "npm"
     state: latest
     update_cache: yes
+
+- name: "install n"
+  become: yes
   npm:
-    name: "{{ item }}"
+    name: n
+    global: yes
+    production: yes
+
+- name: "install nodejs 13.8.0"
+  become: yes
+  shell: n 13.8.0
+
+- name: "install pm2"
+  become: yes
+  npm:
+    name: pm2
     global: yes
     production: yes
     state: present
-  with_items:
-    - "n"
-    - "pm2"
-
-- name: "Install nodejs 13.8.0"
-  become: yes
-  shell: n 13.8.0
