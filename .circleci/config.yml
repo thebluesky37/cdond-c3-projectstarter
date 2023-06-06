@@ -235,9 +235,11 @@ jobs:
           working_directory: ./backend
           command: |
             cat migrations_dump.txt
-            if grep -q "has been executed successfully." migrations_dump.txt
-            then
-              curl https://kvdb.io/V39ZMkuqpxwpw31tuXcvwt/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            if grep -q "has been executed successfully." migrations_dump.txt; then
+                echo "Migration successfully."
+                curl https://kvdb.io/V39ZMkuqpxwpw31tuXcvwt/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            else
+                echo "Migration failed."
             fi
       - destroy-environment:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}
