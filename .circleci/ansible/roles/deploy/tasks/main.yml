@@ -1,7 +1,4 @@
 ---
-  - name: "show remote environment"
-    shell: env
-
   - name: "copy backend binaries"
     become: yes
     synchronize:
@@ -27,7 +24,6 @@
     args:
       chdir: /home/ubuntu/app/dist
     environment:
-     ENVIRONMENT: production
      TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
      TYPEORM_MIGRATIONS_DIR: "./migrations"
      TYPEORM_MIGRATIONS: "./migrations/*.js"
