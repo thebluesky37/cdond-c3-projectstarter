@@ -362,15 +362,15 @@ jobs:
 
   cloudfront-update:
     docker:
-      - image: cimg/aws:2023.05
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
-            apk add --no-cache tar gzip curl
+            yum install -y tar gzip curl
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            apk add --no-cache nodejs
+            yum install -y nodejs
       - run:
           name: Save WorkflowID in kvdb
           working_directory: ./.circleci/files
