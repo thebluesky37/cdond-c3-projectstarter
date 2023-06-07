@@ -375,7 +375,7 @@ jobs:
           name: Save WorkflowID in kvdb
           working_directory: ./.circleci/files
           command: |
-            WorkflowID=$(aws cloudformation \
+            export WorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             echo ${WorkflowID}
