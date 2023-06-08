@@ -1,2 +1,3 @@
 URL1: https://github.com/thebluesky37/cdond-c3-projectstarter
-URL2: http://udapeople-1ed441f.s3-website-us-east-1.amazonaws.com/#/employees
+URL2: http://udapeople-0f43902.s3-website-us-east-1.amazonaws.com/#/employees
+URL3: d17moinw7na6e8.cloudfront.net
